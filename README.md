@@ -117,7 +117,12 @@ urlpatterns = patterns('',
             name='calculator'),
 ```
 
-*Currently there is no possibility to decorate specific methods of the service.*
+To enable or disable CSRF just use specific adaptor:
+  - `jsonrpcdjango.serve` for CSRF-less handler
+  - `jsonrpcdjango.csrf_serve` for CSRF-protected handler
+  - or use disrectly Django's decorators `csrf_exempt`, `csrf_protect` or use `CsrfViewMiddleware`
+
+*Currently there is no possibility to decorate specific methods of the service with `jsonrpcdjango` adaptor.*
 
 ## Authorization
 
@@ -135,4 +140,4 @@ urlpatterns = patterns('',
             name='calculator'),
 ```
 
-*Currently there is no possibility to decorate specific methods of the service.*
+*Currently there is no possibility to decorate specific methods of the service with `jsonrpcdjango` adaptor.*
