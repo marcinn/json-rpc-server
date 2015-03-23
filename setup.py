@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(name='jsonrpcserver',
       version='0.1',
-      description='Damn simple JSON-RPC server',
+      description='Damn simple, framework-agnostic JSON-RPC server',
       classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
@@ -13,7 +13,7 @@ setup(name='jsonrpcserver',
         ],
       author='Marcin Nowak',
       author_email='marcin.j.nowak@gmail.com',
-      url='',
+      url='https://github.com/marcinn/json-rpc-server',
       keywords='web json rpc python server',
       py_modules=['jsonrpcserver'],
       include_package_data=True,
