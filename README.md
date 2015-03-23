@@ -82,7 +82,7 @@ But there is a simpler way! :)
 
 #### Using existing adaptors
 
-If you need quickly expose your service using Django, just use `jsonrpcserver-django` package,
+If you need quickly expose your service using Django, just use [damn simple JSON-RPC Django adaptor](https://pypi.python.org/pypi/damn-simple-jsonrpc-server-django),
 which contains ready to use adaptor:
 
 (urls.py)
