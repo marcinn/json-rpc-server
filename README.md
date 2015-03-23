@@ -18,6 +18,20 @@ For more information please read JSON-RPC v2.0 specification: http://www.jsonrpc
 
 ## Getting started
 
+### Installation
+
+Use `setuptools` or `pip`:
+
+```
+easy_install damn-simple-jsonrpc-server
+```
+
+or
+
+```
+pip install damn-simple-jsonrpc-server
+```
+
 ### Calculator service example
 
 Let's make calculator service which supports `add` and `subtract` operations. 
