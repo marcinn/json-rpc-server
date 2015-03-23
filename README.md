@@ -141,3 +141,33 @@ urlpatterns = patterns('',
 ```
 
 *Currently there is no possibility to decorate specific methods of the service with `jsonrpcdjango` adaptor.*
+
+## Accessing original HTTP request inside service methods
+
+Sometimes you may need access to specific request data added somewhere
+in middleware stack. In that case you can register JSON-RPC method with
+additional argument `takes_http_request=True`. Original `request` object
+will be passed as first argument.
+
+If you're using Django as an HTTP framework and `jsonrpcdjango` adaptor,
+you can provide access to Django's `HttpRequest` object inside service method
+without any hacks. Just declare `takes_http_request` at registering
+time. This will make your service dependend on Django, but also more flexibility.
+
+
+(calculator_service.py)
+```python
+
+calculator = rpc.Service()
+
+[...]
+
+@calculator.method(takes_http_request=True)
+def beast_add(request, x, y):
+    if request.user.is_superuser:
+        return x+y
+    else:
+        return 666
+
+```
+

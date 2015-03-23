@@ -1,3 +1,4 @@
+from functools import wraps
 import collections
 import json
 
@@ -78,15 +79,24 @@ class Service(object):
     def __init__(self):
         self._methods = {}
 
-    def handle_request_body(self, request):
-        log.debug('Got request raw body: %s', request)
-        try:
-            request_dict = json.loads(request)
-        except (ValueError, TypeError), ex:
-            log.debug('Parse error: %s', ex)
-            return ParseError(unicode(ex)).as_dict()
+    def handle_http_request(self, request):
+        """
+        Handle HTTP request
 
-        response = self.dispatch(request_dict)
+        :param request: Python object with `body` attribute which must contain
+                        stringified JSON-RPC request object
+
+        Returns:
+            stringified JSON-RPC response
+        """
+
+        return self.handle_request_body(request.body, request)
+
+    def handle_request_body(self, body, http_request=None):
+        log.debug('Got request raw body: %s', body)
+
+        request_dict = self.parse_request_body(body)
+        response = self.dispatch(request_dict, http_request)
 
         try:
             response = json.dumps(response.as_dict()) if response else ''
@@ -97,7 +107,14 @@ class Service(object):
             return json.dumps(InternalError(request_dict.get('id'),
                     unicode(ex)).as_dict())
 
-    def dispatch(self, request):
+    def parse_request_body(self, body):
+        try:
+            return json.loads(body)
+        except (ValueError, TypeError), ex:
+            log.debug('Parse error: %s', ex)
+            return ParseError(unicode(ex)).as_dict()
+
+    def dispatch(self, request, http_request=None):
         ident = request.get('id')
 
         log.debug('Dispatching request ID: %s', ident)
@@ -156,7 +173,10 @@ class Service(object):
                     args = params
 
         try:
-            result = method(*args, **kwargs)
+            if method.takes_http_request:
+                result = method(http_request, *args, **kwargs)
+            else:
+                result = method(*args, **kwargs)
         except TypeError, ex:
             log.debug('Invalid method parameters: %s', ex)
             if ident:
@@ -164,21 +184,27 @@ class Service(object):
 
         return Result(ident, result) if ident else None
 
-    def method(self, method):
+    def method(self, method=None, takes_http_request=False):
+
         if callable(method):
-            self.register(method.__name__, method)
+            self.register(method.__name__, method, takes_http_request)
             return method
         else:
             def wrapper(func):
-                self.register(method, func)
+                self.register(method or func.__name__, func, takes_http_request)
                 return func
             return wrapper
 
-    def register(self, method, func):
+    def register(self, method, func, takes_http_request=False):
         if method in self._methods:
             raise AlreadyRegistered('Method `%s` already registered.' % method)
 
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            return func(*args, **kwargs)
+        wrapped.takes_http_request = takes_http_request
+
         log.debug('Registering method `%s`', method)
-        self._methods[method] = func
+        self._methods[method] = wrapped
 
 
