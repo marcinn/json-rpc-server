@@ -151,8 +151,8 @@ will be passed as first argument.
 
 If you're using Django as an HTTP framework and `jsonrpcdjango` adaptor,
 you can provide access to Django's `HttpRequest` object inside service method
-without any hacks. Just declare `takes_http_request` at registering
-time. This will make your service dependend on Django, but also more flexibility.
+without any hacks. Just declare `takes_http_request=True` at registering
+time. This will make your service dependend on Django, but will add more flexibility.
 
 
 (calculator_service.py)
