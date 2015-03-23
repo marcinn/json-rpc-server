@@ -89,10 +89,11 @@ That's all. Nothing more, nothing less!
 
 JSON-RPC `Service` class has very simple API based on str/unicode or request-like object.
 You may use one of the following methods available in `Service` class:
-  - `handle_request_body`,
-  - `handle_http_request`.
+  - `handle_request_body`
+  - `handle_http_request`
   
 The `handle_request_body` method expects that input string will be a representation of a JSON-RPC Request object. 
+
 The `handle_http_request` method expects that request-like object will be passed as an argument. 
 In that case request-like object **must** contain `body` attribute with string representation 
 of JSON-RPC request.
