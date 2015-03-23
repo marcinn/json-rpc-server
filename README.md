@@ -87,18 +87,22 @@ That's all. Nothing more, nothing less!
 
 ### Writing custom adaptors
 
-JSON-RPC `Service` class has very simple API based on str/unicode. 
-The `Service.call` method expects that input string will be a representation of a JSON-RPC Request object.
+JSON-RPC `Service` class has very simple API based on str/unicode or request-like object.
+You may use one of the following methods available in `Service` class:
+  - `handle_request_body`,
+  - `handle_http_request`.
+  
+The `handle_request_body` method expects that input string will be a representation of a JSON-RPC Request object. 
 
-In the similar way `Service.call` will return a str/unicode with a JSON-RPC Response object representation 
-(success and error responses are returned same way, as described in http://www.jsonrpc.org/specification, but contain `result` and `error` keys respectively).
+The `handle_http_request` method expects that request-like object will be passed as an argument. 
+In the second case request-like object **must** contain `body` attribute with string representation 
+of JSON-RPC request.
 
-Pseudocode:
-```
-def my_adaptor(request):
-   body = getRawRequestBody()
-   return callJSONRPCService(body)
-```
+Return value of `handle_request_body` and `handle_http_request` is always a str/unicode
+with a JSON-RPC Response object representation (success and error responses are returned
+same way, as described in http://www.jsonrpc.org/specification, but will contain `result`
+and `error` keys respectively).
+
 
 ## Authentication, CSRF, other stuff...
 
