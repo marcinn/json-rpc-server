@@ -93,9 +93,8 @@ You may use one of the following methods available in `Service` class:
   - `handle_http_request`.
   
 The `handle_request_body` method expects that input string will be a representation of a JSON-RPC Request object. 
-
 The `handle_http_request` method expects that request-like object will be passed as an argument. 
-In the second case request-like object **must** contain `body` attribute with string representation 
+In that case request-like object **must** contain `body` attribute with string representation 
 of JSON-RPC request.
 
 Return value of `handle_request_body` and `handle_http_request` is always a str/unicode
