@@ -6,6 +6,29 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class BaseJsonRpcException(Exception):
+    code = -32603
+
+    def __init__(self, message=None, data=None):
+        super(BaseJsonRpcException, self).__init__(message)
+        self.data=data
+
+
+class InvalidParametersException(BaseJsonRpcException):
+    code = -32602
+
+    def __init__(self, message=None, data=None):
+        super(InvalidParameters, self).__init__(message=message, data=data)
+
+
+class RpcException(BaseJsonRpcException):
+    def __init__(self, code, message=None, data=None):
+        if code >= -32768 and code <=-32000:
+            raise ValueError('Codes between (-32768, -32000) are reserved '\
+                    'for internal use only')
+        self.code = code
+        super(RpcException, self).__init__(message, data=data)
+
 
 class Result(object):
     def __init__(self, id, result):
@@ -181,8 +204,10 @@ class Service(object):
             log.debug('Invalid method parameters: %s', ex)
             if ident:
                 return InvalidParametersError(ident)
-
-        return Result(ident, result) if ident else None
+        except BaseJsonRpcException, ex:
+            return Error(ident, ex.message, ex.code, data=ex.data)
+        else:
+            return Result(ident, result) if ident else None
 
     def method(self, method=None, takes_http_request=False):
 
