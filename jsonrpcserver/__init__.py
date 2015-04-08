@@ -1,6 +1,7 @@
 from functools import wraps
 import collections
 import json
+import inspect
 
 import logging
 log = logging.getLogger(__name__)
@@ -228,6 +229,7 @@ class Service(object):
         def wrapped(*args, **kwargs):
             return func(*args, **kwargs)
         wrapped.takes_http_request = takes_http_request
+        wrapped._argspec = inspect.getargspec(func)
 
         log.debug('Registering method `%s`', method)
         self._methods[method] = wrapped
