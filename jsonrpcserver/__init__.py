@@ -105,6 +105,13 @@ class Service(object):
         self.register('trait_names', self.trait_names)
         self.register('_getAttributeNames', self.get_attribute_names)
 
+        try:
+            getattr(inspect, 'getcallargs') # Python 2.7+
+        except AttributeError:
+            self._validate_method_args = False # Python 2.6 or older
+        else:
+            self._validate_method_args = True # Python 2.7 or newer
+
     def handle_http_request(self, request):
         """
         Handle HTTP request
@@ -201,14 +208,15 @@ class Service(object):
         if method['takes_http_request']:
             args = [http_request]+args
 
-        try:
-            inspect.getcallargs(method['callback'], *args, **kwargs)
-        except TypeError, ex:
-            log.debug('Invalid method parameters: %s', ex)
-            if ident:
-                return InvalidParametersError(ident, data=unicode(ex))
-            else:
-                return
+        if self._validate_method_args:
+            try:
+                inspect.getcallargs(method['callback'], *args, **kwargs)
+            except TypeError, ex:
+                log.debug('Invalid method parameters: %s', ex)
+                if ident:
+                    return InvalidParametersError(ident, data=unicode(ex))
+                else:
+                    return
 
         try:
             result = method['callback'](*args, **kwargs)
