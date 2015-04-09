@@ -102,6 +102,8 @@ class InternalError(Error):
 class Service(object):
     def __init__(self):
         self._methods = {}
+        self.register('trait_names', self.trait_names)
+        self.register('_getAttributeNames', self.get_attribute_names)
 
     def handle_http_request(self, request):
         """
@@ -196,11 +198,11 @@ class Service(object):
                     log.debug('Assuming params as a list-like object')
                     args = params
 
-        if method.takes_http_request:
+        if method['takes_http_request']:
             args = [http_request]+args
 
         try:
-            inspect.getcallargs(method, *args, **kwargs)
+            inspect.getcallargs(method['callback'], *args, **kwargs)
         except TypeError, ex:
             log.debug('Invalid method parameters: %s', ex)
             if ident:
@@ -209,7 +211,7 @@ class Service(object):
                 return
 
         try:
-            result = method(*args, **kwargs)
+            result = method['callback'](*args, **kwargs)
         except BaseJsonRpcException, ex:
             return Error(ident, ex.message, ex.code, data=ex.data)
         else:
@@ -230,10 +232,17 @@ class Service(object):
         if method in self._methods:
             raise AlreadyRegistered('Method `%s` already registered.' % method)
 
-        func.takes_http_request = takes_http_request
-        func._argspec = inspect.getargspec(func)
-
         log.debug('Registering method `%s`', method)
-        self._methods[method] = func
+        self._methods[method] = {
+                'callback': func,
+                'takes_http_request': takes_http_request,
+                'argspec': inspect.getargspec(func),
+                }
 
+    def trait_names(self):
+        return filter(lambda x: not x.startswith('_') and not x=='trait_names',
+                self._methods.keys())
+
+    def get_attribute_names(self):
+        return []
 
