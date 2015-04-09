@@ -196,15 +196,20 @@ class Service(object):
                     log.debug('Assuming params as a list-like object')
                     args = params
 
+        if method.takes_http_request:
+            args = [http_request]+args
+
         try:
-            if method.takes_http_request:
-                result = method(http_request, *args, **kwargs)
-            else:
-                result = method(*args, **kwargs)
+            inspect.getcallargs(method, *args, **kwargs)
         except TypeError, ex:
             log.debug('Invalid method parameters: %s', ex)
             if ident:
-                return InvalidParametersError(ident)
+                return InvalidParametersError(ident, data=unicode(ex))
+            else:
+                return
+
+        try:
+            result = method(*args, **kwargs)
         except BaseJsonRpcException, ex:
             return Error(ident, ex.message, ex.code, data=ex.data)
         else:
@@ -225,13 +230,10 @@ class Service(object):
         if method in self._methods:
             raise AlreadyRegistered('Method `%s` already registered.' % method)
 
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            return func(*args, **kwargs)
-        wrapped.takes_http_request = takes_http_request
-        wrapped._argspec = inspect.getargspec(func)
+        func.takes_http_request = takes_http_request
+        func._argspec = inspect.getargspec(func)
 
         log.debug('Registering method `%s`', method)
-        self._methods[method] = wrapped
+        self._methods[method] = func
 
 
