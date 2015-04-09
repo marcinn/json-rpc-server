@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='damn-simple-jsonrpc-server',
-      version='0.4.0',
+      version='0.4.1',
       description='Damn simple, framework-agnostic JSON-RPC server',
       classifiers=[
         "Development Status :: 3 - Alpha",

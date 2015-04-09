@@ -240,9 +240,11 @@ class Service(object):
                 }
 
     def trait_names(self):
-        return filter(lambda x: not x.startswith('_') and not x=='trait_names',
-                self._methods.keys())
+        return self.public_methods().keys()
 
     def get_attribute_names(self):
         return []
 
+    def public_methods(self):
+        return dict(filter(lambda x: not x[0].startswith('_')\
+                and not x[0]=='trait_names', self._methods.items()))

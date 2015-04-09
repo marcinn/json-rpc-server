@@ -30,13 +30,14 @@ def trim_docstring(docstring):
 
 def introspect(service, url):
     methods = []
-    for method, callback in service._methods.items():
+    for method, meta in service.public_methods().items():
+        callback = meta['callback']
         methods.append({
             'name': method,
             'description': trim_docstring(callback.__doc__),
-            'args': callback._argspec.args,
+            'args': meta['argspec'].args,
             'invocation': '%s%s' % (method,
-                inspect.formatargspec(*callback._argspec)),
+                inspect.formatargspec(*meta['argspec'])),
             })
     return {
             'methods': methods,
