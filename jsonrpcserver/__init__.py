@@ -2,6 +2,7 @@ from functools import wraps
 import collections
 import json
 import inspect
+import six
 
 import logging
 log = logging.getLogger(__name__)
@@ -135,17 +136,17 @@ class Service(object):
             response = json.dumps(response.as_dict()) if response else ''
             log.debug('Sending raw response: %s', response)
             return response
-        except (TypeError, ValueError), ex:
+        except (TypeError, ValueError) as ex:
             log.debug('Internal error: %s', ex)
             return json.dumps(InternalError(request_dict.get('id'),
-                    unicode(ex)).as_dict())
+                    six.text_type(ex)).as_dict())
 
     def parse_request_body(self, body):
         try:
             return json.loads(body)
-        except (ValueError, TypeError), ex:
+        except (ValueError, TypeError) as ex:
             log.debug('Parse error: %s', ex)
-            return ParseError(unicode(ex)).as_dict()
+            return ParseError(six.text_type(ex)).as_dict()
 
     def dispatch(self, request, http_request=None):
         ident = request.get('id')
@@ -211,16 +212,17 @@ class Service(object):
         if self._validate_method_args:
             try:
                 inspect.getcallargs(method['callback'], *args, **kwargs)
-            except TypeError, ex:
+            except TypeError as ex:
                 log.debug('Invalid method parameters: %s', ex)
                 if ident:
-                    return InvalidParametersError(ident, data=unicode(ex))
+                    return InvalidParametersError(
+                        ident, data=six.text_type(ex))
                 else:
                     return
 
         try:
             result = method['callback'](*args, **kwargs)
-        except BaseJsonRpcException, ex:
+        except BaseJsonRpcException as ex:
             return Error(ident, ex.message, ex.code, data=ex.data)
         else:
             return Result(ident, result) if ident else None
