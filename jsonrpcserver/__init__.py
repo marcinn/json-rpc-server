@@ -1,4 +1,3 @@
-from functools import wraps
 import collections
 import json
 import inspect
@@ -13,21 +12,28 @@ class BaseJsonRpcException(Exception):
 
     def __init__(self, message=None, data=None):
         super(BaseJsonRpcException, self).__init__(message)
-        self.data=data
+        self.message = message
+        self.data = data
+
+
+class AlreadyRegistered(Exception):
+    pass
 
 
 class InvalidParametersException(BaseJsonRpcException):
     code = -32602
 
     def __init__(self, message=None, data=None):
-        super(InvalidParameters, self).__init__(message=message, data=data)
+        super(InvalidParametersException, self).__init__(
+                                    message=message, data=data)
 
 
 class RpcException(BaseJsonRpcException):
     def __init__(self, code, message=None, data=None):
-        if code >= -32768 and code <=-32000:
-            raise ValueError('Codes between (-32768, -32000) are reserved '\
-                    'for internal use only')
+        if code >= -32768 and code <= -32000:
+            raise ValueError(
+                'Codes between (-32768, -32000) are reserved '
+                'for internal use only')
         self.code = code
         super(RpcException, self).__init__(message, data=data)
 
@@ -72,32 +78,34 @@ class Error(object):
 
 class MethodNotFoundError(Error):
     def __init__(self, id, method, data=None):
-        super(MethodNotFoundError, self).__init__(id,
-            'Method not found `%s`' % method, -32601, data=data)
+        super(MethodNotFoundError, self).__init__(
+            id, 'Method not found `%s`' % method, -32601, data=data)
 
 
 class InvalidRequestError(Error):
     def __init__(self, id, message, data=None):
-        super(InvalidRequestError, self).__init__(id, message, -32600,
-                data=data)
+        super(InvalidRequestError, self).__init__(
+            id, message, -32600, data=data)
 
 
 class ParseError(Error):
     def __init__(self, message, data=None):
-        super(ParseError, self).__init__(None,
-            'Server received invalid JSON: %s' % message, -32700, data=data)
+        super(ParseError, self).__init__(
+            None, 'Server received invalid JSON: %s' % message,
+            -32700, data=data)
 
 
 class InvalidParametersError(Error):
     def __init__(self, id, message=None, data=None):
-        super(InvalidParametersError, self).__init__(id,
-            message or 'Invalid parameters number or format', -32602, data=data)
+        super(InvalidParametersError, self).__init__(
+            id, message or 'Invalid parameters number or format',
+            -32602, data=data)
 
 
 class InternalError(Error):
     def __init__(self, id, message=None, data=None):
-        super(InternalError, self).__init__(id, message or 'Internal Error',
-                -32603, data=data)
+        super(InternalError, self).__init__(
+            id, message or 'Internal Error', -32603, data=data)
 
 
 class Service(object):
@@ -107,11 +115,11 @@ class Service(object):
         self.register('_getAttributeNames', self.get_attribute_names)
 
         try:
-            getattr(inspect, 'getcallargs') # Python 2.7+
+            getattr(inspect, 'getcallargs')  # Python 2.7+
         except AttributeError:
-            self._validate_method_args = False # Python 2.6 or older
+            self._validate_method_args = False  # Python 2.6 or older
         else:
-            self._validate_method_args = True # Python 2.7 or newer
+            self._validate_method_args = True  # Python 2.7 or newer
 
     def handle_http_request(self, request):
         """
@@ -138,8 +146,8 @@ class Service(object):
             return response
         except (TypeError, ValueError) as ex:
             log.debug('Internal error: %s', ex)
-            return json.dumps(InternalError(request_dict.get('id'),
-                    six.text_type(ex)).as_dict())
+            return json.dumps(InternalError(
+                request_dict.get('id'), six.text_type(ex)).as_dict())
 
     def parse_request_body(self, body):
         try:
@@ -157,16 +165,17 @@ class Service(object):
         except KeyError:
             log.debug('Missing `jsonrpc` key in request payload')
             if ident:
-                return InvalidRequestError(ident,
-                        'Missing `jsonrpc` key in request object')
+                return InvalidRequestError(
+                    ident, 'Missing `jsonrpc` key in request object')
             else:
                 return
 
         if not version == '2.0':
             log.debug('Requested unsupported JSON-RPC version: %s', version)
             if ident:
-                return InvalidRequestError(ident,
-                    'Server supports only version 2.0 of the JSON-RPC protocol')
+                return InvalidRequestError(
+                    ident, 'Server supports only version 2.0 of '
+                           'the JSON-RPC protocol')
             else:
                 return
 
@@ -175,8 +184,8 @@ class Service(object):
         except KeyError:
             log.debug('Missing `method` key in request payload')
             if ident:
-                return InvalidRequestError(ident,
-                    'Missing `method` key in request object')
+                return InvalidRequestError(
+                    ident, 'Missing `method` key in request object')
             else:
                 return
 
@@ -234,13 +243,15 @@ class Service(object):
             return method
         else:
             def wrapper(func):
-                self.register(method or func.__name__, func, takes_http_request)
+                self.register(
+                    method or func.__name__, func, takes_http_request)
                 return func
             return wrapper
 
     def register(self, method, func, takes_http_request=False):
         if method in self._methods:
-            raise AlreadyRegistered('Method `%s` already registered.' % method)
+            raise AlreadyRegistered(
+                    'Method `%s` already registered.' % method)
 
         log.debug('Registering method `%s`', method)
         self._methods[method] = {
@@ -256,5 +267,7 @@ class Service(object):
         return []
 
     def public_methods(self):
-        return dict(filter(lambda x: not x[0].startswith('_')\
-                and not x[0]=='trait_names', self._methods.items()))
+        return dict(filter(
+            lambda x: (not x[0].startswith('_')
+                       and not x[0] == 'trait_names'),
+            self._methods.items()))

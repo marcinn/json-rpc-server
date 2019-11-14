@@ -1,13 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(name='damn-simple-jsonrpc-server',
-      version='0.4.3',
+      version='0.4.4',
       description='Damn simple, framework-agnostic JSON-RPC server',
       classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
