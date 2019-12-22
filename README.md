@@ -1,32 +1,31 @@
+
+![PyPI](https://img.shields.io/pypi/v/damn-simple-jsonrpc-server.svg)
+![Downloads](https://pepy.tech/badge/damn-simple-jsonrpc-server)
+![Coverage Status](https://coveralls.io/repos/github/marcinn/json-rpc-server/badge.svg?branch=master)
+
+
 # JSON-RPC Server for Python
 
-This is damn simple, framework-agnostic JSON-RPC v2.0 server for Python.
+This is a core implementation of JSON-RPC v2.0 server for Python.
 
-**This package has no dependencies.**
-You can build service API without thinking about any framework nor toolkit, and even without thinking about HTTP itself.
-This package is an implementation of JSON-RPC protocol only, following rules described on http://www.jsonrpc.org/specification
+Available adapters:
+- [Django](https://github.com/marcinn/json-rpc-server-django/)
 
-## What is JSON-RPC?
+## Features
 
-JSON-RPC is a protocor similar to XML-RPC, but simpler and very lightweight.
-There is no necessary to generate nor parse XML documents by using heavy librariers. 
+- Service oriented 
+- No external dependencies
+- Easy integration with frameworks
 
-You can build easily remote services and call them using clients implemented in many languages.
-JSON-RPC services are always exposed using HTTP(S) protocol.
+## Roadmap
 
-For more information please read JSON-RPC v2.0 specification: http://www.jsonrpc.org/specification
+- 0.6: type hinting
+- 0.7: async support
+- 1.0: final/stable version
 
 ## Getting started
 
 ### Installation
-
-Use `setuptools` or `pip`:
-
-```
-easy_install damn-simple-jsonrpc-server
-```
-
-or
 
 ```
 pip install damn-simple-jsonrpc-server
@@ -188,4 +187,11 @@ def beast_add(request, x, y):
         return 666
 
 ```
+
+## What is JSON-RPC?
+
+JSON-RPC is a protocor similar to XML-RPC, but simpler and very lightweight.
+There is no necessary to generate nor parse XML documents by using heavy librariers. 
+
+For more information please read JSON-RPC v2.0 specification: http://www.jsonrpc.org/specification
 
