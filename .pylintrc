@@ -1,0 +1,10 @@
+[FORMAT]
+max-line-length=88
+
+[MESSAGES CONTROL]
+disable=
+    R0903,  # too-few-public-methods
+    C0116,  # missing-function-docstring
+    R0912,  # too-many-branches
+    R0911   # too-many-return-statements
+
