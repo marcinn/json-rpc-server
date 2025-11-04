@@ -38,7 +38,7 @@ class RpcException(BaseJsonRpcException):
     def __init__(self, code, message=None, data=None):
         if -32768 <= code <= -32000:
             raise ValueError(
-                "Codes between (-32768, -32000) are reserved for  internal use only"
+                "Codes between (-32768, -32000) are reserved for internal use only"
             )
         self.code = code
         super().__init__(message, data=data)
