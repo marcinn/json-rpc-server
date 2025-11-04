@@ -194,6 +194,6 @@ def beast_add(request, x, y):
 ## What is JSON-RPC?
 
 JSON-RPC is a protocol similar to XML-RPC, but simpler and very lightweight.
-There is no necessary to generate nor parse XML documents by using heavy librariers.
+There is no necessary to generate nor parse XML documents by using heavy libraries.
 
 For more information please read JSON-RPC v2.0 specification: http://www.jsonrpc.org/specification
