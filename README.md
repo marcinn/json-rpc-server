@@ -140,7 +140,7 @@ urlpatterns = patterns('',
 To enable or disable CSRF just use specific adaptor:
   - `jsonrpcdjango.serve` for CSRF-less handler
   - `jsonrpcdjango.csrf_serve` for CSRF-protected handler
-  - or use disrectly Django's decorators `csrf_exempt`, `csrf_protect` or enable `CsrfViewMiddleware` (read https://docs.djangoproject.com/en/dev/ref/csrf/ for details)
+  - or use directly Django's decorators `csrf_exempt`, `csrf_protect` or enable `CsrfViewMiddleware` (read https://docs.djangoproject.com/en/dev/ref/csrf/ for details)
 
 *Currently there is no possibility to decorate specific methods of the service with `jsonrpcdjango` adaptor.*
 
